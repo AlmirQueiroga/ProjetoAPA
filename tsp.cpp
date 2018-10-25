@@ -13,7 +13,6 @@ int calcular_custo(int **matriz, vector<int> caminho);
 int opt2(int **matriz, int tamanho, vector<int> vizinho);
 
 int main(){ 
-
 	int tamanho = 0;
 	ifstream grafo_matriz("arquivo.txt", ios::in);
   	//ifstream grafo_matriz("gr17.tsp", ios::in);
@@ -26,10 +25,10 @@ int main(){
 		}
 	}
 	auto solucao_inicial = vizinho(matriz, tamanho);
-	//int cu= calcular_custo(matriz, solucao_inicial);
-	//cout <<cu<<endl;
 	cout << swap(matriz, tamanho, solucao_inicial);
-
+	cout << endl;
+	cout << opt2(matriz, tamanho, solucao_inicial);
+	cout << endl;
 	for(int i = 0; i < solucao_inicial.size()-1; i++){
 		cout << " " << solucao_inicial[i];
 	}
@@ -124,24 +123,26 @@ int calcular_custo(int **matriz, vector<int> caminho) {
     return custo;
 }
 
+
 int opt2(int **matriz, int tamanho, vector<int> vizinho){
 	vector <int> temporario;
 	int custo_primario = calcular_custo(matriz, vizinho);
 	int custo_temporario;
 	temporario = vizinho;
+	for(int j = 1; j < tamanho/2; j++){
+		for(int i = j; i < tamanho/2; i++){
+			
+			int aux = temporario[tamanho - i];
+			temporario[tamanho - i] = temporario[i];
+			temporario[i] = aux;
+			
+			custo_temporario = calcular_custo(matriz, temporario);
 
-	for(int i = 0; i < tamanho - 2; i++){
-		temporario = vizinho;
-		int aux = temporario[i+2];
-		temporario[i+2] = temporario[i];
-		temporario[i] = aux;
-
-		temporario[tamanho] = temporario[0];
-		custo_temporario = calcular_custo(matriz, temporario);
-
-		if(custo_temporario < custo_primario){
-			custo_primario = custo_temporario;
-			vizinho = temporario;
+			if(custo_temporario < custo_primario){
+				custo_primario = custo_temporario;
+				vizinho = temporario;
+			}
+			
 		}
 	}
 
@@ -149,6 +150,7 @@ int opt2(int **matriz, int tamanho, vector<int> vizinho){
 
 	return custo_temporario;
 }
+
 
 int ** criarVetor2D(int tamanho){
 	int **a = new int*[tamanho];
