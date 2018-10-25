@@ -14,7 +14,7 @@ int opt2(int **matriz, int tamanho, vector<int> vizinho);
 
 int main(){ 
 	int tamanho = 0;
-	ifstream grafo_matriz("arquivo.txt", ios::in);
+	ifstream grafo_matriz("pcv10.txt", ios::in);
   	//ifstream grafo_matriz("gr17.tsp", ios::in);
 	grafo_matriz >> tamanho; //salva o tamanho da matriz
 	int **matriz = criarVetor2D(tamanho);
@@ -25,9 +25,9 @@ int main(){
 		}
 	}
 	auto solucao_inicial = vizinho(matriz, tamanho);
-	cout << swap(matriz, tamanho, solucao_inicial);
+	cout << "Custo swap: " << swap(matriz, tamanho, solucao_inicial);
 	cout << endl;
-	cout << opt2(matriz, tamanho, solucao_inicial);
+	cout << "Custo opt2: " << opt2(matriz, tamanho, solucao_inicial);
 	cout << endl;
 	for(int i = 0; i < solucao_inicial.size()-1; i++){
 		cout << " " << solucao_inicial[i];
@@ -43,7 +43,6 @@ int main(){
 	*/
 	return 0;
 }
-
 
 
 vector<int> vizinho(int **matriz, int tamanho){
