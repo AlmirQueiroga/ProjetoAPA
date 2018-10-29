@@ -13,8 +13,10 @@ int calculaCusto(int **matriz, vector<int> caminho);
 void imprimeSolucao(vector<int> solucao);
 //int opt2(vector<int> solucao, int **matriz, int tamanho, int custo);
 //vector<int> opt2Swap(vector<int> solucao, int limite1, int limite2);
-vector<int>  opt2(int **matriz, int tamanho, vector<int> vizinho);
+vector <int> opt2(vector <int> solucao, int ** matriz, int tamanho);
 void vnd(vector <int> solucao, int **matriz, int tamanho);
+vector <int> inverte(vector <int> solucao, int limite1, int limite2, int tamanho);
+
 
 int main(){ 
 	int tamanho = 0;
@@ -30,8 +32,10 @@ int main(){
 		}
 	}
 	//fim letura do arquivo
-
+	
 	auto solucao_inicial = vizinho(matriz, tamanho); //Solução inicial gerada com o algortimo do vizinho mais proximo
+	//vector <int> tuim = inverte(solucao_inicial, 1, 9, tamanho);
+	//cout << "INVERTIDO "; imprimeSolucao(tuim); 
 	cout << "Solucao Inicial: "; imprimeSolucao(solucao_inicial);
 	vnd(solucao_inicial, matriz, tamanho); //Busca Local
 
@@ -106,87 +110,25 @@ vector<int> swap(int **matriz, int tamanho, vector<int> vizinho){
 return vizinho;
 	
 }
-
-//Movimento de vizinhança 2
-vector <int> opt2(int **matriz, int tamanho, vector<int> vizinho){
-	vector <int> temporario;
-	int custo_primario = calculaCusto(matriz, vizinho);
-	int custo_temporario;
-	temporario = vizinho;
-	for(int j = 1; j < tamanho/2; j++){
-		for(int i = j; i < tamanho/2; i++){
-			
-			int aux = temporario[tamanho - i];
-			temporario[tamanho - i] = temporario[i];
-			temporario[i] = aux;
-			
-			custo_temporario = calculaCusto(matriz, temporario);
-			if(custo_temporario < custo_primario){
-				custo_primario = custo_temporario;
-				vizinho = temporario;
-			}
-			
-		}
-	}
-
-	return vizinho;
-}
-
-
-/*
-vector<int> opt2Swap(vector <int> solucao, int limite1, int limite2){
-	vector<int> novarota;
-	novarota = solucao;
-	for(int i = limite2; i > limite1; i--){
-		novarota.push_back(solucao[i]);
-		cout << i;
-	}
-
-	return novarota;
-}
-
-int opt2(vector<int> solucao, int ** matriz, int tamanho, int custo){
-	vector <int> novarota;
-	vector <int> solucao_atual;
-	int melhor_custo = custo;
-	int novo_custo;
-	cout << melhor_custo;
-
-	for(int i = 1; i < tamanho ; i++){
-		for(int k = i + 1; k < tamanho; i++){
-			novarota = opt2Swap(solucao, i, k);
-			novo_custo = calculaCusto(matriz, novarota);
-			if(novo_custo < melhor_custo){
-				solucao_atual = novarota;
-				melhor_custo = novo_custo;
-			}
-		}
-	}
-
-	return melhor_custo;
-}
-*/
-
 //Busca Local
 void vnd(vector <int> solucao, int **matriz, int tamanho){
 	int numEstruturas = 2;
 	int i = 1;
-	int custo = calculaCusto(matriz, solucao);
 	int custo_atual;
 	vector <int> melhor_solucao;
 	melhor_solucao = solucao;
+
 
 	while( i <= numEstruturas){
 		if(i == 1){
 			melhor_solucao = swap(matriz, tamanho, solucao);
 			custo_atual = calculaCusto(matriz, melhor_solucao);
-			custo =  calculaCusto(matriz,solucao);
 		}else if( i == 2){
-			melhor_solucao = opt2(matriz, tamanho, solucao);
+			cout << "thales e gay\n";
+			melhor_solucao = opt2(solucao, matriz, tamanho);
 			custo_atual = calculaCusto(matriz, melhor_solucao);
-			custo =  calculaCusto(matriz,solucao);
 		}
-
+		int custo = calculaCusto(matriz, solucao);
 		if(custo_atual < custo){
 			solucao = melhor_solucao;
 			i = 1;
@@ -229,65 +171,40 @@ void imprimeSolucao(vector<int> solucao){
 	cout << endl;
 }
 
+vector <int> inverte(vector <int> solucao, int limite1, int limite2, int tamanho){
+	vector <int> temporario;
 
+	temporario = solucao;
 
-
-
-
-/*
-int opt2(vector <int> solucao, int *limite1, int *limite2, int **matriz){
-	int troca, trocaux, melhortroca = 0;
-	*limite1 = 0;
-	*limite2 = 0;
-	for(int i = 2; i < solucao.size() - 2; i++){
-		troca = matriz[solucao[i]][solucao[i-1]];
-		for(int j = i + 4; j < solucao.size() - 2; j++){
-			trocaux = troca + matriz[solucao[j]][solucao[j+1]] - (matriz[solucao[i-1]][solucao[j]]+ matriz[solucao[i]][solucao[j+1]]);
-			if(trocaux > 0 && trocaux > melhortroca){
-				melhortroca = trocaux;
-				*limite1 = i;
-				*limite2 = j;
-			}
-		}
-	}
-
-	return melhortroca;
-}
-*/
-/*
-vector<int> trocaOpt2(vector <int> solucao, int limite1, int limite2){
-	int i = limite1;
-	int j = limite2;
-	int aux = 0;
-	cout << "teste";
-	if((limite1 - limite2)%2 == 0){
-		do{
-			aux = solucao[i];
-			solucao[i] = solucao[j];
-			solucao[j] = aux;
-			i++;
-			j--;
-		}while(i!=j);
-	}else{
-		do{
-			aux = solucao[i];
-			solucao[i] = solucao[j];
-			solucao[j] = aux;
-			i++;
-			j--;
-		}while(i!= j + 1);
-	}
-
-	if(limite1 == 1 || limite2 == solucao.size() - 2){
-		solucao[0] = solucao[solucao.size() - 2];
-		solucao[solucao.size() - 1] = solucao[1];
+	for(int i = limite1, j = limite2; i <= limite2; i++, j--){
+		solucao[i] = temporario[j];
 	}
 
 	return solucao;
 }
-*/
 
 
+vector <int> opt2(vector <int> solucao, int ** matriz, int tamanho){
+	int custo = calculaCusto(matriz, solucao);
+	vector <int> temporario;
+	vector <int> final;
+	int aux;
+
+	temporario = solucao;
+
+	for(int i = 1; i < tamanho - 1; i++){
+		for(int j = 2; j < tamanho - 1; j++){
+			temporario = inverte(temporario, i, j, tamanho);
+			aux = calculaCusto(matriz, temporario);
+			if(custo > aux){
+				custo = aux;
+				final = temporario;
+			}
+		}
+	}
+
+	return final;
+}
 
 /*
 for(int i = 0; i < tamanho; i++){
