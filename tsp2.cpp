@@ -3,20 +3,48 @@
 #include <vector>
 #include <algorithm>
 #include <limits.h>
+#include <time.h>
 
 using namespace std;
+
+class Aresta{
+private:
+	int origem, destino, peso;
+
+public:
+	Aresta(int origem, int destino, int peso){
+		this->origem = origem;
+		this->destino = destino;
+		this->peso = peso;
+		srand(time(NULL));
+	}
+	int getOrigem(){
+		return origem;
+	}
+	int getDestino(){
+		return destino;
+	}
+	int getPeso(){
+		return peso;
+	}
+	
+};
 
 int ** criarVetor2D(int tamanho);
 vector<int> vizinho(int **matriz, int tamanho);
 vector<int> swap(int **matriz, int tamanho, vector<int> vizinho);
 int calculaCusto(int **matriz, vector<int> caminho);
 void imprimeSolucao(vector<int> solucao);
-//int opt2(vector<int> solucao, int **matriz, int tamanho, int custo);
-//vector<int> opt2Swap(vector<int> solucao, int limite1, int limite2);
-vector <int> opt2(vector <int> solucao, int ** matriz, int tamanho);
 void vnd(vector <int> solucao, int **matriz, int tamanho);
 vector <int> inverte(vector <int> solucao, int limite1, int limite2, int tamanho);
+void exibevector(vector <Aresta> grafo);
+vector <int> opt2(int **matriz, int tamanho, vector <int> vizinho);
 
+bool compara(Aresta num1, Aresta num2){
+	return (num1.getPeso() < num2.getPeso());
+}
+void grasp(vector <Aresta> lc, float alfa, int tamanho, int numMAX);
+vector <Aresta> construtivoGrasp(vector <Aresta> lc, float alfa, int tamanho);
 
 int main(){ 
 	int tamanho = 0;
@@ -26,13 +54,25 @@ int main(){
 	grafo_matriz >> tamanho; 
 	int **matriz = criarVetor2D(tamanho);
 
+	vector <Aresta> lc;
+
 	for (int i = 0; i < tamanho; i++){
 		for (int j = 0; j < tamanho; j++){
 			grafo_matriz >> matriz[i][j];
 		}
 	}
 	//fim letura do arquivo
-	
+	//salva num vector de arestas
+
+	for (int i = 0; i < tamanho; i++){
+		for (int j = i + 1; j < tamanho; j++){
+			Aresta aresta(i,j,matriz[i][j]);
+			lc.push_back(aresta);
+		}
+	}
+	//fim do vector de arestas
+	grasp(lc, 0.25, tamanho,3);
+
 	auto solucao_inicial = vizinho(matriz, tamanho); //Solução inicial gerada com o algortimo do vizinho mais proximo
 	//vector <int> tuim = inverte(solucao_inicial, 1, 9, tamanho);
 	//cout << "INVERTIDO "; imprimeSolucao(tuim); 
@@ -42,6 +82,72 @@ int main(){
 	return 0;
 }
 
+
+
+void grasp(vector <Aresta> lc, float alfa, int tamanho, int numMAX){
+	sort(lc.begin(), lc.end(), compara); //ordena a lista de candidas pelo custo
+	int quantidade = alfa * (lc.size()); //guarda a porcentagem que será avaliada da lc
+	int verificado[tamanho] = {0}; //array auxiliar para inserção na solucao
+	vector <Aresta> solucao; //vector de saida
+	int aux, aleatorio, i, indice, origem;
+
+	srand(time(NULL));
+	aux = quantidade - 1;
+	aleatorio = rand() % aux; //gerando o numero aleatorio
+	//seleciona o elemento aleatorio da lc
+	indice = lc[aleatorio].getDestino(); 
+	//guarda a origem do elemento escolhido
+	origem = lc[aleatorio].getOrigem();
+	//insere na solucao o primeiro elemento escolhido
+	solucao.push_back(lc[aleatorio]);
+	cout << "Solucao 1 :" ; exibevector(solucao);
+	verificado[origem] = 1;
+	//apaga todos as arestas que tem origem igual ao vertice já inserido na solução
+	for(int i = 0; i < lc.size(); i++){
+		if(lc[i].getOrigem() == origem){
+			lc.erase(lc.begin() + i);
+		}
+	}
+
+	i = 1;
+
+	while( i < tamanho){
+		quantidade = alfa * (lc.size()); //calcula a nova porcentagem
+		aux = quantidade - 1;
+		aleatorio = rand() % aux;
+
+		indice = lc[aleatorio].getDestino();
+		origem = lc[aleatorio].getOrigem();
+		//Se o destino da aresta tiver segura...
+		if(verificado[indice] == 0 && verificado[origem] == ){
+			solucao.push_back(lc[aleatorio]);
+			verificado[indice] = 1;
+			i++;
+
+			for(int i = 0; i < lc.size(); i++){
+				if(lc[i].getOrigem() == origem){
+					lc.erase(lc.begin() + 1);
+				}
+			}
+		}
+
+		
+
+		cout << "solucao " << i << endl;
+		exibevector(solucao);
+		cout << endl;
+		cout <<"iteracao: " << i << endl;
+		exibevector(lc);
+
+	
+	}
+
+	cout << "vector solucao" << endl;
+	exibevector(solucao);
+	
+
+
+}
 //Heuristica construtiva
 vector<int> vizinho(int **matriz, int tamanho){
 
@@ -71,7 +177,6 @@ vector<int> vizinho(int **matriz, int tamanho){
 		solucao.push_back(indice);
 		
 	}
-
 	caminho[tamanho] = 0;
 	solucao.push_back(0);
 
@@ -81,6 +186,14 @@ vector<int> vizinho(int **matriz, int tamanho){
 	
 	cout << "Custo " << custo_final << endl;
 	return solucao;
+}
+
+void exibevector(vector<Aresta> grafo){
+	for(int i = 0; i < grafo.size(); i++){
+		cout << " " << grafo[i].getOrigem();
+		cout << "-" << grafo[i].getDestino();
+		cout << " " << grafo[i].getPeso() << endl;
+	}
 }
 
 //Movimento de vizinhaça 1
@@ -115,6 +228,7 @@ void vnd(vector <int> solucao, int **matriz, int tamanho){
 	int numEstruturas = 2;
 	int i = 1;
 	int custo_atual;
+	int custo;
 	vector <int> melhor_solucao;
 	melhor_solucao = solucao;
 
@@ -124,11 +238,11 @@ void vnd(vector <int> solucao, int **matriz, int tamanho){
 			melhor_solucao = swap(matriz, tamanho, solucao);
 			custo_atual = calculaCusto(matriz, melhor_solucao);
 		}else if( i == 2){
-			cout << "thales e gay\n";
-			melhor_solucao = opt2(solucao, matriz, tamanho);
+			melhor_solucao = opt2(matriz, tamanho, solucao);
 			custo_atual = calculaCusto(matriz, melhor_solucao);
+			
 		}
-		int custo = calculaCusto(matriz, solucao);
+		custo = calculaCusto(matriz, solucao);
 		if(custo_atual < custo){
 			solucao = melhor_solucao;
 			i = 1;
@@ -184,43 +298,27 @@ vector <int> inverte(vector <int> solucao, int limite1, int limite2, int tamanho
 }
 
 
-vector <int> opt2(vector <int> solucao, int ** matriz, int tamanho){
-	int custo = calculaCusto(matriz, solucao);
+vector <int> opt2(int **matriz, int tamanho, vector <int> vizinho){
 	vector <int> temporario;
-	vector <int> final;
-	int aux;
+	vector <int> inicial;
+	inicial = vizinho;
 
-	temporario = solucao;
+	int custo_primario = calculaCusto(matriz, vizinho);
+	int custo_temporario;
+	temporario = vizinho;
 
-	for(int i = 1; i < tamanho - 1; i++){
-		for(int j = 2; j < tamanho - 1; j++){
+	for(int i = 1; i < tamanho; i++){
+		for(int j = i + 1; j < tamanho; j++){
 			temporario = inverte(temporario, i, j, tamanho);
-			aux = calculaCusto(matriz, temporario);
-			if(custo > aux){
-				custo = aux;
-				final = temporario;
+
+			custo_temporario = calculaCusto(matriz, temporario);
+			if(custo_temporario < custo_primario){
+				custo_primario = custo_temporario;
+				vizinho = temporario;
 			}
+			temporario = inicial;
 		}
 	}
 
-	return final;
+	return vizinho;
 }
-
-/*
-for(int i = 0; i < tamanho; i++){
-		int custo = INT_MAX;
-		int indice = 0;
-		for(int j = 0; j < tamanho; j++){
-			if(matriz[aux][j] < custo 
-				&& matriz[aux][j] != 0
-				&& find(solucao.begin(),solucao.end(), j+1) == solucao.end()
-				) {
-				custo = matriz[aux][j];
-				indice = j;
-			}
-		}
-		aux = indice; 
-		solucao.push_back(indice+1);
-		
-	}
-*/

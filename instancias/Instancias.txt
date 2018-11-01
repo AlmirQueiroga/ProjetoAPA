@@ -1,0 +1,41 @@
+INSTANCIAS TSP
+
+26 cidades
+1- https://people.sc.fsu.edu/~jburkardt/datasets/tsp/fri26_d.txt
+a partir deste link: https://people.sc.fsu.edu/~jburkardt/datasets/tsp/tsp.html
+otimo : 937
+
+48 cidades
+2- https://people.sc.fsu.edu/~jburkardt/datasets/tsp/att48_d.txt
+otimo : 10628
+
+
+
+retiradas daqui: http://www.cs.nott.ac.uk/~pszdk/gtsp.html
+
+brazil 58
+otimo: 15332
+
+bturma14
+otimo : 3323
+
+gr17
+otimo: 2085
+
+gr96
+otimo:55209
+
+gr120
+otimo: 6942
+
+gr137:
+otimo: 69853
+
+gr229
+otimo: 134602 
+
+si535
+otimo: 48450
+
+
+
