@@ -1,4 +1,0 @@
-instância: pcv04.txt
-valor : 7
-circuito : 1 - 2 - 4 - 3 - 1
-
