@@ -7,27 +7,13 @@
 
 using namespace std;
 
-class Aresta{
-private:
-	int origem, destino, peso;
-
+class CustoCandidato{
 public:
-	Aresta(int origem, int destino, int peso){
-		this->origem = origem;
-		this->destino = destino;
-		this->peso = peso;
-		srand(time(NULL));
+	int custo, elemento;
+	CustoCandidato(int i, int cust){
+		elemento = i;
+		this->custo = custo;
 	}
-	int getOrigem(){
-		return origem;
-	}
-	int getDestino(){
-		return destino;
-	}
-	int getPeso(){
-		return peso;
-	}
-	
 };
 
 int ** criarVetor2D(int tamanho);
@@ -35,26 +21,34 @@ vector<int> vizinho(int **matriz, int tamanho);
 vector<int> swap(int **matriz, int tamanho, vector<int> vizinho);
 int calculaCusto(int **matriz, vector<int> caminho);
 void imprimeSolucao(vector<int> solucao);
-void vnd(vector <int> solucao, int **matriz, int tamanho);
+vector<int>  vnd(vector <int> solucao, int **matriz, int tamanho);
 vector <int> inverte(vector <int> solucao, int limite1, int limite2, int tamanho);
-void exibevector(vector <Aresta> grafo);
 vector <int> opt2(int **matriz, int tamanho, vector <int> vizinho);
+vector <int> GRC(int a, int tamanho, int **matriz);
+CustoCandidato custo_calc(vector <int> solucao, int i, int ant, int **matriz);
+void GRASP(int **matriz, int tamanho, int maxIteracao);
+int minCusto(vector<CustoCandidato> &v);
+int maxCusto(vector <CustoCandidato> &v);
+bool procura_candidato(vector<int> v, int a);
 
-bool compara(Aresta num1, Aresta num2){
-	return (num1.getPeso() < num2.getPeso());
-}
-void grasp(vector <Aresta> lc, float alfa, int tamanho, int numMAX);
-vector <Aresta> construtivoGrasp(vector <Aresta> lc, float alfa, int tamanho);
 
 int main(){ 
 	int tamanho = 0;
 	int limite1, limite2;
 	//Leitura do arquivo
-	ifstream grafo_matriz("pcv10.txt", ios::in);
+	//ifstream grafo_matriz("instancias/brazil58.txt", ios::in);
+	//ifstream grafo_matriz("instancias/burma14.txt", ios::in);
+	//ifstream grafo_matriz("instancias/gr17.txt", ios::in);
+	//ifstream grafo_matriz("instancias/gr96.txt", ios::in);
+	//ifstream grafo_matriz("instancias/gr120.txt", ios::in);
+	//ifstream grafo_matriz("instancias/gr137.txt", ios::in);
+	//ifstream grafo_matriz("instancias/gr229.txt", ios::in);
+	//ifstream grafo_matriz("instancias/rbg323.txt", ios::in);
+	ifstream grafo_matriz("instancias/si535.txt", ios::in);
+	
 	grafo_matriz >> tamanho; 
 	int **matriz = criarVetor2D(tamanho);
-
-	vector <Aresta> lc;
+	cout << "tamanho da matriz: " << tamanho << endl;
 
 	for (int i = 0; i < tamanho; i++){
 		for (int j = 0; j < tamanho; j++){
@@ -63,91 +57,29 @@ int main(){
 	}
 	//fim letura do arquivo
 	//salva num vector de arestas
-
+	/*
 	for (int i = 0; i < tamanho; i++){
 		for (int j = i + 1; j < tamanho; j++){
 			Aresta aresta(i,j,matriz[i][j]);
 			lc.push_back(aresta);
 		}
 	}
+	*/
+
+	//exibir matriz lida
+
 	//fim do vector de arestas
-	grasp(lc, 0.25, tamanho,3);
 
 	auto solucao_inicial = vizinho(matriz, tamanho); //Solução inicial gerada com o algortimo do vizinho mais proximo
 	//vector <int> tuim = inverte(solucao_inicial, 1, 9, tamanho);
 	//cout << "INVERTIDO "; imprimeSolucao(tuim); 
-	cout << "Solucao Inicial: "; imprimeSolucao(solucao_inicial);
+	//cout << "Solucao Inicial: "; imprimeSolucao(solucao_inicial);
+	GRASP(matriz, tamanho, 10);
 	vnd(solucao_inicial, matriz, tamanho); //Busca Local
 
 	return 0;
 }
 
-
-
-void grasp(vector <Aresta> lc, float alfa, int tamanho, int numMAX){
-	sort(lc.begin(), lc.end(), compara); //ordena a lista de candidas pelo custo
-	int quantidade = alfa * (lc.size()); //guarda a porcentagem que será avaliada da lc
-	int verificado[tamanho] = {0}; //array auxiliar para inserção na solucao
-	vector <Aresta> solucao; //vector de saida
-	int aux, aleatorio, i, indice, origem;
-
-	srand(time(NULL));
-	aux = quantidade - 1;
-	aleatorio = rand() % aux; //gerando o numero aleatorio
-	//seleciona o elemento aleatorio da lc
-	indice = lc[aleatorio].getDestino(); 
-	//guarda a origem do elemento escolhido
-	origem = lc[aleatorio].getOrigem();
-	//insere na solucao o primeiro elemento escolhido
-	solucao.push_back(lc[aleatorio]);
-	cout << "Solucao 1 :" ; exibevector(solucao);
-	verificado[origem] = 1;
-	//apaga todos as arestas que tem origem igual ao vertice já inserido na solução
-	for(int i = 0; i < lc.size(); i++){
-		if(lc[i].getOrigem() == origem){
-			lc.erase(lc.begin() + i);
-		}
-	}
-
-	i = 1;
-
-	while( i < tamanho){
-		quantidade = alfa * (lc.size()); //calcula a nova porcentagem
-		aux = quantidade - 1;
-		aleatorio = rand() % aux;
-
-		indice = lc[aleatorio].getDestino();
-		origem = lc[aleatorio].getOrigem();
-		//Se o destino da aresta tiver segura...
-		if(verificado[indice] == 0 && verificado[origem] == ){
-			solucao.push_back(lc[aleatorio]);
-			verificado[indice] = 1;
-			i++;
-
-			for(int i = 0; i < lc.size(); i++){
-				if(lc[i].getOrigem() == origem){
-					lc.erase(lc.begin() + 1);
-				}
-			}
-		}
-
-		
-
-		cout << "solucao " << i << endl;
-		exibevector(solucao);
-		cout << endl;
-		cout <<"iteracao: " << i << endl;
-		exibevector(lc);
-
-	
-	}
-
-	cout << "vector solucao" << endl;
-	exibevector(solucao);
-	
-
-
-}
 //Heuristica construtiva
 vector<int> vizinho(int **matriz, int tamanho){
 
@@ -180,20 +112,13 @@ vector<int> vizinho(int **matriz, int tamanho){
 	caminho[tamanho] = 0;
 	solucao.push_back(0);
 
-	for (int i = 0; i < tamanho; i++)
+	for (int i = 0; i < tamanho; i++){
 		custo_final += matriz[caminho[i]][caminho[i+1]];
+	}
 
 	
-	cout << "Custo " << custo_final << endl;
+	cout << "Custo da solucao gulosa: " << custo_final << endl;
 	return solucao;
-}
-
-void exibevector(vector<Aresta> grafo){
-	for(int i = 0; i < grafo.size(); i++){
-		cout << " " << grafo[i].getOrigem();
-		cout << "-" << grafo[i].getDestino();
-		cout << " " << grafo[i].getPeso() << endl;
-	}
 }
 
 //Movimento de vizinhaça 1
@@ -223,8 +148,89 @@ vector<int> swap(int **matriz, int tamanho, vector<int> vizinho){
 return vizinho;
 	
 }
+
+void GRASP(int **matriz, int tamanho, int maxIteracao){
+	int custo_solucao = INT_MAX;
+	int total;
+
+	vector <int> solucao;
+	vector <int> melhor_solucao;
+
+	for(int i = 0; i < maxIteracao; i++){
+		solucao = GRC((float) rand() / (float) RAND_MAX, tamanho, matriz);
+		solucao = vnd(solucao, matriz, tamanho);
+		total = calculaCusto(matriz, solucao);
+		if(total < custo_solucao){
+			custo_solucao = total;
+			melhor_solucao = solucao;
+		}
+	}
+
+	cout << "Custo GRASP: " << custo_solucao << endl;
+}
+
+vector <int> GRC(int a, int tamanho, int **matriz){
+	vector<int> solucao;
+	solucao.push_back((int)(rand()%tamanho ));
+	while(solucao.size() != tamanho){
+		vector<CustoCandidato> custoRecurso;
+		for(int i = 0; i < tamanho; i++){
+			if(!procura_candidato(solucao,i))
+				custoRecurso.push_back(custo_calc(solucao, i, solucao[solucao.size()-1], matriz));
+		}
+
+		vector<CustoCandidato> LCR;
+		int Fcustominimo = minCusto(custoRecurso);
+		int Fcustomaximo = maxCusto(custoRecurso);
+
+		int decisao = Fcustominimo + a*(Fcustomaximo - Fcustominimo);
+
+		for(int i = 0; i < custoRecurso.size(); i++){
+			if(custoRecurso[i].custo <= decisao)
+				LCR.push_back(custoRecurso[i]);
+		}
+		srand(clock());
+		int aleatorio = rand() % (LCR.size());
+
+		solucao.push_back(LCR[aleatorio].elemento);
+	}
+	solucao.push_back(solucao[0]);
+	return solucao;
+}
+
+CustoCandidato custo_calc(vector <int> solucao, int i, int ant, int **matriz){
+		return CustoCandidato(i, matriz[ant][i]);
+}
+
+int minCusto(vector<CustoCandidato> &v){
+	int min = INT_MAX;
+
+	for(int i = 0; i < v.size(); i++){
+		if(v[i].custo < min)
+			min = v[i].custo;
+	}
+
+	return min;
+}
+
+int maxCusto(vector <CustoCandidato> &v){
+	int max = 0;
+
+	for(int i = 0; i < v.size();i++){
+		if(v[i].custo > max)
+			max = v[i].custo;
+	}
+
+	return max;
+}
+
+bool procura_candidato(vector<int> v, int a){
+	for(int i = 0; i < v.size();i++)
+		if(a == v[i]) return true;
+	return false;
+}
 //Busca Local
-void vnd(vector <int> solucao, int **matriz, int tamanho){
+vector<int> vnd(vector <int> solucao, int **matriz, int tamanho){
 	int numEstruturas = 2;
 	int i = 1;
 	int custo_atual;
@@ -251,9 +257,9 @@ void vnd(vector <int> solucao, int **matriz, int tamanho){
 		}
 	}
 
-	cout << "Melhor solução encontrada com custo: " << custo_atual << endl;
-	imprimeSolucao(melhor_solucao);
-
+	//cout << "Custo VND: " << custo_atual << endl;
+	//imprimeSolucao(melhor_solucao);
+	return solucao;
 }
 //Calcula custo da solução
 int calculaCusto(int **matriz, vector<int> caminho) {

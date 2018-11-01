@@ -14,7 +14,7 @@ otimo : 10628
 retiradas daqui: http://www.cs.nott.ac.uk/~pszdk/gtsp.html
 
 brazil 58
-otimo: 15332
+otimo: 25395
 
 bturma14
 otimo : 3323
@@ -38,4 +38,7 @@ si535
 otimo: 48450
 
 
+link do grasp:
+
+http://www.cleveralgorithms.com/nature-inspired/stochastic/grasp.html
 

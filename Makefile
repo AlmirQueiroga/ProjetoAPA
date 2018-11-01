@@ -1,5 +1,5 @@
 run:
-	g++ -std=c++11 tsp2.cpp -o tsp
+	g++ -g -std=c++11 tsp2.cpp -o tsp
 	./tsp
 
 clean:
